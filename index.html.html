@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap - Interactive Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .device-container {
+            position: relative;
+            width: 375px;
+            height: 812px;
+            background: #1a1a1a;
+            border-radius: 35px;
+            padding: 8px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 27px;
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            z-index: 10;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .nav-tabs {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab.active {
+            color: #667eea;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: currentColor;
+        }
+
+        .tab-text {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 20px;
+            height: calc(100% - 124px);
+            overflow-y: auto;
+        }
+
+        /* Landing Screen */
+        .hero {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        }
+
+        .skill-fusion-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .mind-left, .mind-right {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .mind-left {
+            background: rgba(255, 255, 255, 0.15);
+            left: 8px;
+            animation: pulse-left 2.5s infinite;
+        }
+
+        .mind-right {
+            background: rgba(255, 255, 255, 0.15);
+            right: 8px;
+            animation: pulse-right 2.5s infinite 1s;
+        }
+
+        .mind-content {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            position: relative;
+        }
+
+        .mind-left .mind-content {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+
+        .mind-right .mind-content {
+            background: linear-gradient(45deg, #4ecdc4, #7fdbda);
+        }
+
+        .thought-bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float-up 3s infinite;
+        }
+
+        .bubble-1 {
+            width: 3px;
+            height: 3px;
+            left: 20px;
+            top: 15px;
+            animation-delay: 0s;
+        }
+
+        .bubble-2 {
+            width: 2px;
+            height: 2px;
+            left: 24px;
+            top: 12px;
+            animation-delay: 0.5s;
+        }
+
+        .bubble-3 {
+            width: 4px;
+            height: 4px;
+            right: 20px;
+            top: 15px;
+            animation-delay: 1s;
+        }
+
+        .bubble-4 {
+            width: 2px;
+            height: 2px;
+            right: 24px;
+            top: 12px;
+            animation-delay: 1.5s;
+        }
+
+        .fusion-center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ffd700, #fff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            animation: intense-glow 2s infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .connection-rays {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ray {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to top, transparent, rgba(255, 215, 0, 0.8), transparent);
+            left: 50%;
+            top: 50%;
+            transform-origin: bottom;
+            animation: ray-pulse 2s infinite;
+        }
+
+        .ray-1 {
+            height: 25px;
+            transform: translateX(-50%) translateY(-100%) rotate(-30deg);
+            animation-delay: 0s;
+        }
+
+        .ray-2 {
+            height: 20px;
+            transform: translateX(-50%) translateY(-100%) rotate(0deg);
+            animation-delay: 0.3s;
+        }
+
+        .ray-3 {
+            height: 25px;
+            transform: translateX(-50%) translateY(-100%) rotate(30deg);
+            animation-delay: 0.6s;
+        }
+
+        @keyframes pulse-left {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+            }
+            50% { 
+                transform: scale(1.15);
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.7);
+            }
+        }
+
+        @keyframes pulse-right {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
+            }
+            50% { 
+                transform: scale(1.15);
+                box-shadow: 0 0 20px rgba(78, 205, 196, 0.7);
+            }
+        }
+
+        @keyframes intense-glow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+            50% { 
+                transform: scale(1.3);
+                box-shadow: 0 0 35px rgba(255, 215, 0, 1), 0 0 50px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        @keyframes float-up {
+            0% { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            50% { 
+                opacity: 1; 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            }
+        }
+
+        @keyframes ray-pulse {
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: translateX(-50%) translateY(-100%) rotate(var(--rotation)) scaleY(0.5);
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(-100%) rotate(var(--rotation)) scaleY(1);
+            }
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Profile Screen */
+        .profile-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px 20px 30px;
+            margin: -20px -20px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .skill-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .skill-tag.offer {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .skill-tag.want {
+            background: #fed7e2;
+            color: #702459;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        /* Discovery Screen */
+        .search-bar {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            padding: 15px 20px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-chip {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-chip.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .user-rating {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .stars {
+            color: #fbbf24;
+            margin-right: 5px;
+        }
+
+        .distance {
+            margin-left: auto;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .user-skills {
+            margin-bottom: 10px;
+        }
+
+        .swap-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .swap-button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Messaging Screen */
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.received .message-bubble {
+            background: #f1f5f9;
+            color: #2d3748;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.sent .message-bubble {
+            background: #667eea;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .swap-request-card {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .request-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .request-details {
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .request-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .accept-btn, .decline-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accept-btn {
+            background: #38b2ac;
+            color: white;
+        }
+
+        .decline-btn {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        .nav-indicator {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        /* Screen-specific styles */
+        .welcome-content {
+            text-align: center;
+            padding: 80px 0 40px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .feature-text {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .feed-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .feed-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, #fef5e7, #fed7aa);
+            border: 2px solid #f6ad55;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .user-avatar.small {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .challenge-icon {
+            width: 40px;
+            height: 40px;
+            background: #f6ad55;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .challenge-content {
+            margin-bottom: 15px;
+        }
+
+        .challenge-content p {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .challenge-stats {
+            font-size: 12px;
+            color: #8b4513;
+            font-weight: 500;
+        }
+
+        .join-challenge-btn {
+            background: #f6ad55;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .swap-badge, .tip-badge, .collab-badge {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .swap-badge {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .tip-badge {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .collab-badge {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .before-after {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 12px;
+        }
+
+        .before-after-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .mock-image {
+            width: 80px;
+            height: 60px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #4a5568;
+            margin: 0 auto 5px;
+        }
+
+        .mock-image.after {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .arrow {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .before-after-item span {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 13px;
+            color: #718096;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+
+        .action-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #5a67d8;
+        }
+
+        .tip-category {
+            margin-top: 10px;
+        }
+
+        .collab-skills {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .screen.active {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .device-container {
+                width: 100%;
+                max-width: 375px;
+                height: 100vh;
+                border-radius: 0;
+                padding: 0;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-container">
+        <!-- Screen 1: Landing/Welcome -->
+        <div class="screen active" id="landing">
+            <div class="notch"></div>
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●○○</span>
+            </div>
+            <div class="content">
+                <div class="hero">
+                    <div class="logo">
+                        <div class="skill-fusion-icon">
+                            <div class="mind-left">
+                                <div class="mind-content">💡</div>
+                            </div>
+                            <div class="mind-right">
+                                <div class="mind-content">💡</div>
+                            </div>
+                            <div class="thought-bubbles">
+                                <div class="bubble bubble-1"></div>
+                                <div class="bubble bubble-2"></div>
+                                <div class="bubble bubble-3"></div>
+                                <div class="bubble bubble-4"></div>
+                            </div>
+                            <div class="connection-rays">
+                                <div class="ray ray-1" style="--rotation: -30deg;"></div>
+                                <div class="ray ray-2" style="--rotation: 0deg;"></div>
+                                <div class="ray ray-3" style="--rotation: 30deg;"></div>
+                            </div>
+                            <div class="fusion-center">🌟</div>
+                        </div>
+                    </div>
+                    <h1>SkillSwap</h1>
+                    <p>When minds connect, magic happens<br><strong>Trade skills • Build futures</strong></p>
+                </div>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Smart Matching</div>
+                            <div class="feature-desc">Find people with skills you want who need skills you have</div>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">⭐</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Trust & Safety</div>
+                            <div class="feature-desc">Verified profiles and ratings for secure exchanges</div>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Easy Coordination</div>
+                            <div class="feature-desc">Built-in messaging and scheduling tools</div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <button class="cta-button" onclick="showScreen('discovery')">Get Started</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Discovery/Browse -->
+        <div class="screen" id="discovery">
+            <div class="notch"></div>
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●○</span>
+            </div>
+            <div class="content">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: -8px; top: -2px; font-size: 12px;">🧠</span>
+                            <span style="position: absolute; right: -8px; top: -2px; font-size: 12px;">🧠</span>
+                            <span style="font-size: 8px; color: #ffd700;">✨</span>
+                        </div>
+                    </div>
+                    <h2 style="font-size: 20px; font-weight: 700; color: #2d3748;">Discover Skills</h2>
+                </div>
+                
+                <input type="text" class="search-bar" placeholder="Search skills (e.g., guitar, coding, cooking)">
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active">Near Me</div>
+                    <div class="filter-chip">New Users</div>
+                    <div class="filter-chip">Highly Rated</div>
+                    <div class="filter-chip">Available Now</div>
+                </div>
+
+                <div class="user-card" onclick="showScreen('profile')">
+                    <div class="user-card-header">
+                        <div class="user-avatar">AM</div>
+                        <div class="user-info">
+                            <h3>Aaron Miller</h3>
+                            <div class="user-rating">
+                                <span class="stars">★★★★★</span>
+                                4.8 (12 swaps)
+                            </div>
+                        </div>
+                        <div class="distance">0.8 mi</div>
+                    </div>
+                    <div class="user-skills">
+                        <div style="margin-bottom: 8px;">
+                            <strong style="font-size: 13px; color: #22543d;">Offers:</strong>
+                            <span class="skill-tag offer">Graphic Design</span>
+                            <span class="skill-tag offer">Photoshop</span>
+                        </div>
+                        <div>
+                            <strong style="font-size: 13px; color: #702459;">Wants:</strong>
+                            <span class="skill-tag want">Spanish</span>
+                            <span class="skill-tag want">Cooking</span>
+                        </div>
+                    </div>
+                    <button class="swap-button">View Profile & Swap</button>
+                </div>
+
+                <div class="user-card">
+                    <div class="user-card-header">
+                        <div class="user-avatar">JS</div>
+                        <div class="user-info">
+                            <h3>Jessica Stone</h3>
+                            <div class="user-rating">
+                                <span class="stars">★★★★☆</span>
+                                4.5 (8 swaps)
+                            </div>
+                        </div>
+                        <div class="distance">1.2 mi</div>
+                    </div>
+                    <div class="user-skills">
+                        <div style="margin-bottom: 8px;">
+                            <strong style="font-size: 13px; color: #22543d;">Offers:</strong>
+                            <span class="skill-tag offer">Yoga</span>
+                            <span class="skill-tag offer">Meditation</span>
+                        </div>
+                        <div>
+                            <strong style="font-size: 13px; color: #702459;">Wants:</strong>
+                            <span class="skill-tag want">Web Design</span>
+                            <span class="skill-tag want">Photography</span>
+                        </div>
+                    </div>
+                    <button class="swap-button">View Profile & Swap</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: User Profile -->
+        <div class="screen" id="profile">
+            <div class="notch"></div>
+            <div class="status-bar" style="color: white;">
+                <span>9:41</span>
+                <span>●●●●●</span>
+            </div>
+            <div class="profile-header">
+                <div class="profile-pic">AM</div>
+                <div class="profile-name">Aaron Miller</div>
+                <div class="profile-bio">Freelance designer passionate about helping others learn visual skills</div>
+            </div>
+            <div class="content" style="padding-top: 0;">
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Swaps Done</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.8</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">0.8</div>
+                        <div class="stat-label">Miles Away</div>
+                    </div>
+                </div>
+
+                <div class="skill-section">
+                    <div class="section-title">Skills I Can Teach</div>
+                    <div class="skill-tags">
+                        <div class="skill-tag offer">Graphic Design</div>
+                        <div class="skill-tag offer">Photoshop</div>
+                        <div class="skill-tag offer">Logo Design</div>
+                        <div class="skill-tag offer">Branding</div>
+                    </div>
+                </div>
+
+                <div class="skill-section">
+                    <div class="section-title">Skills I Want to Learn</div>
+                    <div class="skill-tags">
+                        <div class="skill-tag want">Spanish</div>
+                        <div class="skill-tag want">Cooking</div>
+                        <div class="skill-tag want">Guitar</div>
+                    </div>
+                </div>
+
+                <button class="cta-button" onclick="showScreen('messaging')" style="margin-top: 20px;">
+                    Propose Skill Swap
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Feed -->
+        <div class="screen" id="feed">
+            <div class="notch"></div>
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●●</span>
+            </div>
+            <div class="content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 24px; font-weight: 700; color: #2d3748;">Community Feed</h2>
+                    <button style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 15px; font-size: 12px; cursor: pointer;">+ Share</button>
+                </div>
+
+                <!-- Skill Challenge Card -->
+                <div class="feed-card challenge-card">
+                    <div class="card-header">
+                        <div class="challenge-icon">🏆</div>
+                        <div>
+                            <div class="card-title">Weekly Challenge</div>
+                            <div class="card-subtitle">Active until Friday</div>
+                        </div>
+                    </div>
+                    <div class="challenge-content">
+                        <p><strong>"Teach 1 skill tip, learn 1 skill tip"</strong></p>
+                        <p>Share a quick tip from your expertise and discover something new!</p>
+                        <div class="challenge-stats">42 participants • 28 tips shared</div>
+                    </div>
+                    <button class="join-challenge-btn">Join Challenge</button>
+                </div>
+
+                <!-- Swap Story Card -->
+                <div class="feed-card">
+                    <div class="card-header">
+                        <div class="user-avatar small">MG</div>
+                        <div>
+                            <div class="card-title">Maria Garcia</div>
+                            <div class="card-subtitle">2 hours ago</div>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <span class="swap-badge">Swap Complete</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>Just finished an amazing graphic design swap with Aaron! 🎨 Learned Photoshop layer basics in exchange for Spanish conversation practice. Here's my first logo attempt!</p>
+                        <div class="before-after">
+                            <div class="before-after-item">
+                                <div class="mock-image">Before</div>
+                                <span>Day 1 sketch</span>
+                            </div>
+                            <div class="arrow">→</div>
+                            <div class="before-after-item">
+                                <div class="mock-image after">After</div>
+                                <span>After swap!</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn">❤️ 12</button>
+                        <button class="action-btn">💬 5</button>
+                        <button class="action-btn">🔄 Share</button>
+                    </div>
+                </div>
+
+                <!-- Skill Tip Card -->
+                <div class="feed-card">
+                    <div class="card-header">
+                        <div class="user-avatar small">AM</div>
+                        <div>
+                            <div class="card-title">Aaron Miller</div>
+                            <div class="card-subtitle">4 hours ago</div>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <span class="tip-badge">Quick Tip</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p><strong>Photoshop Pro Tip:</strong> Use Ctrl+J to duplicate any layer instantly instead of right-clicking! Saves tons of time when editing. 🚀</p>
+                        <div class="tip-category">
+                            <span class="skill-tag offer">Graphic Design</span>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn">❤️ 24</button>
+                        <button class="action-btn">💬 8</button>
+                        <button class="action-btn">📚 Save</button>
+                    </div>
+                </div>
+
+                <!-- Collaboration Call -->
+                <div class="feed-card">
+                    <div class="card-header">
+                        <div class="user-avatar small">JS</div>
+                        <div>
+                            <div class="card-title">Jessica Stone</div>
+                            <div class="card-subtitle">1 day ago</div>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <span class="collab-badge">Looking to Swap</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>Anyone know <strong>basic web development</strong>? I can teach yoga fundamentals and meditation techniques in return! 🧘‍♀️</p>
+                        <div class="collab-skills">
+                            <div>
+                                <span style="font-size: 12px; color: #22543d;">Offering:</span>
+                                <span class="skill-tag offer">Yoga</span>
+                                <span class="skill-tag offer">Meditation</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn primary">🤝 Propose Swap</button>
+                        <button class="action-btn">💬 3</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 5: Messaging -->
+        <div class="screen" id="messaging">
+            <div class="notch"></div>
+            <div class="chat-header">
+                <button class="back-btn" onclick="showScreen('profile')">←</button>
+                <div>
+                    <div style="font-weight: 600;">Aaron Miller</div>
+                    <div style="font-size: 12px; opacity: 0.8;">Active 2 min ago</div>
+                </div>
+            </div>
+            <div class="content" style="padding-top: 0;">
+                <div class="chat-messages">
+                    <div class="message received">
+                        <div class="message-bubble">
+                            Hi! I saw you're looking to learn Spanish. I'd love to help in exchange for some graphic design tips!
+                        </div>
+                    </div>
+                    <div class="message sent">
+                        <div class="message-bubble">
+                            That sounds perfect! I'm working on a logo project and could use feedback.
+                        </div>
+                    </div>
+                    <div class="swap-request-card">
+                        <div class="request-title">📚 Skill Swap Proposal</div>
+                        <div class="request-details">
+                            <strong>You teach:</strong> Graphic Design (2 hours)<br>
+                            <strong>I teach:</strong> Spanish Basics (2 hours)<br>
+                            <strong>When:</strong> This Saturday, 2 PM<br>
+                            <strong>Where:</strong> Video call
+                        </div>
+                        <div class="request-buttons">
+                            <button class="accept-btn">Accept Swap</button>
+                            <button class="decline-btn">Decline</button>
+                        </div>
+                    </div>
+                    <div class="message received">
+                        <div class="message-bubble">
+                            Great! Looking forward to our session 😊
+                        </div>
+                    </div>
+                </div>
+                <div class="message-input">
+                    <input type="text" placeholder="Type a message..." style="border-radius: 25px; padding: 12px 16px; border: 2px solid #e2e8f0; flex: 1;">
+                    <button class="send-btn">→</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <div class="tab" onclick="showScreen('landing')">
+                <svg class="tab-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="tab-text">Home</span>
+            </div>
+            <div class="tab" onclick="showScreen('discovery')">
+                <svg class="tab-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <span class="tab-text">Discover</span>
+            </div>
+            <div class="tab active" onclick="showScreen('feed')">
+                <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span class="tab-text">Feed</span>
+            </div>
+            <div class="tab" onclick="showScreen('messaging')">
+                <svg class="tab-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                <span class="tab-text">Messages</span>
+            </div>
+            <div class="tab" onclick="showScreen('profile')">
+                <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span class="tab-text">Profile</span>
+            </div>
+        </div>
+
+        <!-- Navigation dots -->
+        <div class="nav-indicator">
+            <div class="dot" onclick="showScreen('landing')"></div>
+            <div class="dot" onclick="showScreen('discovery')"></div>
+            <div class="dot active" onclick="showScreen('feed')"></div>
+            <div class="dot" onclick="showScreen('profile')"></div>
+            <div class="dot" onclick="showScreen('messaging')"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'landing';
+        
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update navigation dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+            });
+            
+            const screens = ['landing', 'discovery', 'profile', 'messaging'];
+            const activeIndex = screens.indexOf(screenId);
+            if (activeIndex !== -1) {
+                document.querySelectorAll('.dot')[activeIndex].classList.add('active');
+            }
+            
+            // Update tab states
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Set active tab based on screen
+            if (screenId === 'discovery') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            } else if (screenId === 'feed') {
+                document.querySelectorAll('.tab')[2].classList.add('active');
+            } else if (screenId === 'messaging') {
+                document.querySelectorAll('.tab')[3].classList.add('active');
+            } else if (screenId === 'profile') {
+                document.querySelectorAll('.tab')[4].classList.add('active');
+            }
+            
+            currentScreen = screenId;
+        }
+        
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate skill tags on hover
+            document.querySelectorAll('.skill-tag').forEach(tag => {
+                tag.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                tag.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Filter chip interactions
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Message input interaction
+            const messageInput = document.querySelector('.message-input input');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        // Simulate sending message
+                        const messagesContainer = document.querySelector('.chat-messages');
+                        const newMessage = document.createElement('div');
+                        newMessage.className = 'message sent';
+                        newMessage.innerHTML = `<div class="message-bubble">${this.value}</div>`;
+                        messagesContainer.appendChild(newMessage);
+                        this.value = '';
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                });
+            }
+            
+            // Accept/decline button interactions
+            document.querySelectorAll('.accept-btn, .decline-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.swap-request-card');
+                    if (this.classList.contains('accept-btn')) {
+                        card.style.background = '#c6f6d5';
+                        card.innerHTML = '<div style="text-align: center; padding: 10px; color: #22543d; font-weight: 600;">✅ Swap Accepted! Check your calendar for details.</div>';
+                    } else {
+                        card.style.background = '#fed7d7';
+                        card.innerHTML = '<div style="text-align: center; padding: 10px; color: #c53030; font-weight: 600;">❌ Swap Declined</div>';
+                    }
+                });
+            });
+            
+            // Search bar interaction
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar) {
+                searchBar.addEventListener('focus', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                });
+                searchBar.addEventListener('blur', function() {
+                    this.style.borderColor = '#e2e8f0';
+                    this.style.boxShadow = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
